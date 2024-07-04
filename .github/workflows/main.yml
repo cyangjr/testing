@@ -1,0 +1,60 @@
+name: CI Workflow
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      if: runner.os == 'Linux'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Run Linux commands inside container
+      if: runner.os == 'Linux'
+      uses: addnab/docker-run-action@v3
+      with:
+        image: 'python:3.8-slim'
+        options: '-v ${{ github.workspace }}:/workspace'
+        run: |
+          cd /workspace
+          echo "Running Linux specific commands in container"
+          # Add your Linux specific commands here
+
+    - name: Set up Python
+      if: runner.os == 'Windows'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Run Windows specific commands
+      if: runner.os == 'Windows'
+      run: |
+        echo "Running Windows specific commands"
+        # Add your Windows specific commands here
+
+    - name: Set up Python
+      if: runner.os == 'macOS'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Run macOS specific commands
+      if: runner.os == 'macOS'
+      run: |
+        echo "Running macOS specific commands"
+        # Add your macOS specific commands here
+
+    - name: Run common steps
+      run: |
+        echo "Running common steps for all platforms"
+        # Add your common steps here
